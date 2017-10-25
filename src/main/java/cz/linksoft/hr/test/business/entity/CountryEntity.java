@@ -1,4 +1,4 @@
-package cz.linksoft.hr.test.api.entity;
+package cz.linksoft.hr.test.business.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,17 +17,18 @@ import java.util.List;
 public class CountryEntity extends AbstractEntity {
 
     /** Unique ISO country code. */
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 2)
     @NotNull
+    @Size(min = 1, max = 2)
     private String code;
 
     /** Country name. */
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, max = 64)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "country")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "country")
     private List<RegionEntity> regions;
 
     public String getCode() {

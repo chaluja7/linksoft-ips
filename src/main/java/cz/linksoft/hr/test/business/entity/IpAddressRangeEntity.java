@@ -1,4 +1,4 @@
-package cz.linksoft.hr.test.api.entity;
+package cz.linksoft.hr.test.business.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -15,18 +15,21 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "ip_address_ranges")
+@NamedQuery(name = "IpAddressRangeEntity.findByCityId",
+    query = "select distinct i from IpAddressRangeEntity i where i.city.id = :cityId")
+
 public class IpAddressRangeEntity extends AbstractEntity {
 
     /** IP address range FROM. In form of "IP NUMBER" */
     @Column(nullable = false)
     @NotNull
-    @Min(0)
+    @Min(0) //Max can be defined as Unsigned int max value for IPv4
     private Long rangeFrom;
 
     /** IP address range TO. In form of "IP NUMBER" */
     @Column(nullable = false)
     @NotNull
-    @Min(0)
+    @Min(0) //Max can be defined as Unsigned int max value for IPv4
     private Long rangeTo;
 
     /** Reference to {@link CityEntity}. */

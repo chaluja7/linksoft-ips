@@ -1,4 +1,4 @@
-package cz.linksoft.hr.test.api.entity;
+package cz.linksoft.hr.test.business.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,12 +14,14 @@ import java.util.List;
  */
 @Entity
 @Table(name = "regions")
+@NamedQuery(name = "RegionEntity.findByCountryId",
+    query = "select distinct r from RegionEntity r left outer join fetch r.country where r.country.id = :countryId order by r.id")
 public class RegionEntity extends AbstractEntity {
 
     /** Region name. */
-    @Column(nullable = false)
+    @Column(nullable = false, length = 128)
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, max = 128)
     private String name;
 
     /** Reference to {@link CountryEntity}. */
@@ -27,7 +29,7 @@ public class RegionEntity extends AbstractEntity {
     @JoinColumn(name = "country_id")
     private CountryEntity country;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "region")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "region")
     private List<CityEntity> cities;
 
     public String getName() {

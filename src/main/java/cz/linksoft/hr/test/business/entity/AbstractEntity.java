@@ -1,4 +1,4 @@
-package cz.linksoft.hr.test.api.entity;
+package cz.linksoft.hr.test.business.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;

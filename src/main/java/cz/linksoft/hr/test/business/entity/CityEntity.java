@@ -1,4 +1,4 @@
-package cz.linksoft.hr.test.api.entity;
+package cz.linksoft.hr.test.business.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -16,12 +16,18 @@ import java.util.List;
  */
 @Entity
 @Table(name = "cities")
+@NamedQueries({
+    @NamedQuery(name = "CityEntity.findByRegionId",
+        query = "select distinct c from CityEntity c left outer join fetch c.region where c.region.id = :regionId order by c.id"),
+    @NamedQuery(name = "CityEntity.findByCountryId",
+        query = "select distinct c from CityEntity c left outer join fetch c.region where c.region.country.id = :countryId order by c.id")
+})
 public class CityEntity extends AbstractEntity {
 
     /** City name. Not unique on purpose. */
-    @Column(nullable = false)
+    @Column(nullable = false, length = 128)
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, max = 128)
     private String name;
 
     /** Latitude of the city center. */
@@ -43,7 +49,7 @@ public class CityEntity extends AbstractEntity {
     @JoinColumn(name = "region_id")
     private RegionEntity region;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "city")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "city")
     private List<IpAddressRangeEntity> ipAddressRanges;
 
     public String getName() {

@@ -1,47 +1,55 @@
 package cz.linksoft.hr.test.core.service;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import cz.linksoft.hr.test.api.model.City;
 import cz.linksoft.hr.test.api.model.Country;
 import cz.linksoft.hr.test.api.model.Region;
 import cz.linksoft.hr.test.api.service.LocationService;
+import cz.linksoft.hr.test.business.service.CityService;
+import cz.linksoft.hr.test.business.service.CountryService;
+import cz.linksoft.hr.test.business.service.RegionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Primary
 @Service
 public class LocationServiceImpl implements LocationService {
 
+	@Autowired
+	protected CountryService countryService;
+
+	@Autowired
+	protected RegionService regionService;
+
+	@Autowired
+	protected CityService cityService;
+
 	@Nonnull
 	@Override
 	public List<Country> getAllCountries() {
-		//TODO implement me!
-		return null;
+		return countryService.getAll().stream().map(EntityConverter::mapCountry).collect(Collectors.toList());
 	}
 
 	@Nonnull
 	@Override
 	public List<Region> getAllCountryRegions(@Nonnull Long countryId) {
-		//TODO implement me!
-		return null;
+		return regionService.findByCountryId(countryId).stream().map(EntityConverter::mapRegion).collect(Collectors.toList());
 	}
 
 	@Nonnull
 	@Override
 	public List<City> getAllRegionCities(@Nonnull Long regionId) {
-		//TODO implement me!
-		return null;
+		return cityService.findByRegionId(regionId).stream().map(EntityConverter::mapCity).collect(Collectors.toList());
 	}
 
 	@Nonnull
 	@Override
 	public List<City> getAllCountryCitites(@Nonnull Long countryId) {
-		//TODO implement me!
-		return null;
+		return cityService.findByCountryId(countryId).stream().map(EntityConverter::mapCity).collect(Collectors.toList());
 	}
 
 }
