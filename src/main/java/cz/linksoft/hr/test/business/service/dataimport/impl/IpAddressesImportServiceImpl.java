@@ -72,6 +72,10 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
 
             try {
                 LOGGER.debug(line);
+                if (line.length() == 0) {
+                    // considered as end of file
+                    break;
+                }
                 // map line
                 importRow = mapLine(line);
 
