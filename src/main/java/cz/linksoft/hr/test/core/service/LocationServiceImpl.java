@@ -19,14 +19,16 @@ import java.util.stream.Collectors;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-	@Autowired
-	protected CountryService countryService;
+	private final CountryService countryService;
+	private final RegionService regionService;
+	private final CityService cityService;
 
 	@Autowired
-	protected RegionService regionService;
-
-	@Autowired
-	protected CityService cityService;
+	public LocationServiceImpl(CountryService countryService, RegionService regionService, CityService cityService) {
+		this.countryService = countryService;
+		this.regionService = regionService;
+		this.cityService = cityService;
+	}
 
 	@Nonnull
 	@Override

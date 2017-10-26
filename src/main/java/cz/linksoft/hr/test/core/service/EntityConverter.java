@@ -110,6 +110,10 @@ public class EntityConverter {
             return null;
         }
 
+        if (ipNumber < 0 || ipNumber > ((long) Integer.MAX_VALUE * 2 + 1)) {
+            throw new IllegalArgumentException("IPv4 addresses allowed only! (" + ipNumber + ")");
+        }
+
         final String ip = ((ipNumber >> 24) & 0xFF) + "." + ((ipNumber >> 16) & 0xFF) + "." + ((ipNumber >> 8) & 0xFF) + "." + (ipNumber & 0xFF);
 
         try {
@@ -139,7 +143,7 @@ public class EntityConverter {
 
         final String[] ipAddressInArray = inetAddress.getHostAddress().split("\\.");
         if (ipAddressInArray.length != 4) {
-            throw new IllegalArgumentException("IPv4 addresses allowed only!");
+            throw new IllegalArgumentException("IPv4 addresses allowed only! (" + inetAddress.getHostAddress() + ")");
         }
 
         long result = 0;

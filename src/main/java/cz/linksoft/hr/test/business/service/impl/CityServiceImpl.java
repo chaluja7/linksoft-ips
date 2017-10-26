@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class CityServiceImpl extends AbstractEntityService<CityEntity, CityDao> implements CityService {
 
-    protected IpAddressRangeService ipAddressRangeService;
+    private IpAddressRangeService ipAddressRangeService;
 
     @Autowired
     public CityServiceImpl(CityDao dao,

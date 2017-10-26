@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Will perform traffic limit check based on IP (v4) before proceeding each request to Controller.
+ *
  * @author jakubchalupa
  * @since 26.10.2017
  */
@@ -31,9 +33,9 @@ public class TrafficLimitFilter implements Filter {
     private static final Map<Long, Long> REGION_TRAFFIC_MAP = new HashMap<>();
     private static final Map<Long, Long> COUNTRY_TRAFFIC_MAP = new HashMap<>();
 
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_CITY_PER_HOUR = 2;
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_REGION_PER_HOUR = 4;
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_COUNTRY_PER_HOUR = 6;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_CITY_PER_HOUR = 200;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_REGION_PER_HOUR = 400;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_COUNTRY_PER_HOUR = 600;
 
     private final CityService cityService;
 
@@ -59,12 +61,14 @@ public class TrafficLimitFilter implements Filter {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        // final String requestIpAddress = request.getRemoteAddr();
+        // get IP address
+        final String xx = request.getRemoteAddr();
         // TODO for testing purposes only!
         final String requestIpAddress = "84.16.52.2";
         final InetAddress inetAddress = InetAddress.getByName(requestIpAddress);
         try {
             final Long ipNumber = EntityConverter.mapInetAddressToIpNumber(inetAddress);
+            // locate IP address to city, region and country
             final CityEntity cityEntity = cityService.guessCityForIpNumber(ipNumber);
 
             if (cityEntity != null) {

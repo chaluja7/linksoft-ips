@@ -1,8 +1,7 @@
-package cz.linksoft.hr.test.business.service;
+package cz.linksoft.hr.test.business.service.impl;
 
 import cz.linksoft.hr.test.business.dao.RegionDao;
 import cz.linksoft.hr.test.business.entity.RegionEntity;
-import cz.linksoft.hr.test.business.service.impl.RegionServiceImpl;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Assert;
@@ -19,11 +18,11 @@ import java.util.List;
 public class RegionServiceImplTest extends EasyMockSupport {
 
     private RegionServiceImpl regionService;
-    private RegionDao regionDao = createMock(RegionDao.class);
+    private RegionDao regionDaoMock = createMock(RegionDao.class);
 
     @Before
     public void init() {
-        regionService = new RegionServiceImpl(regionDao);
+        regionService = new RegionServiceImpl(regionDaoMock);
     }
 
     @Test
@@ -34,7 +33,7 @@ public class RegionServiceImplTest extends EasyMockSupport {
         regionEntity.setId(id);
         regionEntity.setName("foo");
 
-        EasyMock.expect(regionDao.find(id)).andReturn(regionEntity);
+        EasyMock.expect(regionDaoMock.find(id)).andReturn(regionEntity);
 
         replayAll();
 
@@ -62,7 +61,7 @@ public class RegionServiceImplTest extends EasyMockSupport {
         regionEntity.setId(1L);
         regionEntity.setName("foo");
 
-        EasyMock.expect(regionDao.getAll()).andReturn(Collections.singletonList(regionEntity));
+        EasyMock.expect(regionDaoMock.getAll()).andReturn(Collections.singletonList(regionEntity));
 
         replayAll();
 
@@ -83,7 +82,7 @@ public class RegionServiceImplTest extends EasyMockSupport {
         regionEntity.setId(regionId);
         regionEntity.setName("foo");
 
-        EasyMock.expect(regionDao.findByCountryId(countryId)).andReturn(Collections.singletonList(regionEntity));
+        EasyMock.expect(regionDaoMock.findByCountryId(countryId)).andReturn(Collections.singletonList(regionEntity));
 
         replayAll();
 

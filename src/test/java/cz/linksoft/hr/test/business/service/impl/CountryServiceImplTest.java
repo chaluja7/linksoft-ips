@@ -1,8 +1,7 @@
-package cz.linksoft.hr.test.business.service;
+package cz.linksoft.hr.test.business.service.impl;
 
 import cz.linksoft.hr.test.business.dao.CountryDao;
 import cz.linksoft.hr.test.business.entity.CountryEntity;
-import cz.linksoft.hr.test.business.service.impl.CountryServiceImpl;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Assert;
@@ -19,11 +18,11 @@ import java.util.List;
 public class CountryServiceImplTest extends EasyMockSupport {
 
     private CountryServiceImpl countryService;
-    private CountryDao countryDao = createMock(CountryDao.class);
+    private CountryDao countryDaoMock = createMock(CountryDao.class);
 
     @Before
     public void init() {
-        countryService = new CountryServiceImpl(countryDao);
+        countryService = new CountryServiceImpl(countryDaoMock);
     }
 
     @Test
@@ -34,7 +33,7 @@ public class CountryServiceImplTest extends EasyMockSupport {
         countryEntity.setId(id);
         countryEntity.setName("foo");
 
-        EasyMock.expect(countryDao.find(id)).andReturn(countryEntity);
+        EasyMock.expect(countryDaoMock.find(id)).andReturn(countryEntity);
 
         replayAll();
 
@@ -62,7 +61,7 @@ public class CountryServiceImplTest extends EasyMockSupport {
         countryEntity.setId(1L);
         countryEntity.setName("foo");
 
-        EasyMock.expect(countryDao.getAll()).andReturn(Collections.singletonList(countryEntity));
+        EasyMock.expect(countryDaoMock.getAll()).andReturn(Collections.singletonList(countryEntity));
 
         replayAll();
 

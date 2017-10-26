@@ -1,12 +1,12 @@
 package cz.linksoft.hr.test.core;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Provider for CSV data with locations and their IP address ranges.

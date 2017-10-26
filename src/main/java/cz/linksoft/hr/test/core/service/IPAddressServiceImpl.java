@@ -19,11 +19,14 @@ import java.util.stream.Collectors;
 @Service
 public class IPAddressServiceImpl implements IPAddressService {
 
-	@Autowired
-	protected IpAddressRangeService ipAddressRangeService;
+	private final IpAddressRangeService ipAddressRangeService;
+	private final CityService cityService;
 
 	@Autowired
-	private CityService cityService;
+	public IPAddressServiceImpl(IpAddressRangeService ipAddressRangeService, CityService cityService) {
+		this.ipAddressRangeService = ipAddressRangeService;
+		this.cityService = cityService;
+	}
 
 	@Nonnull
 	@Override

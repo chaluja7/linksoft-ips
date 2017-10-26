@@ -1,9 +1,9 @@
-package cz.linksoft.hr.test.business.service;
+package cz.linksoft.hr.test.business.service.impl;
 
 import cz.linksoft.hr.test.business.dao.CityDao;
 import cz.linksoft.hr.test.business.entity.CityEntity;
 import cz.linksoft.hr.test.business.entity.IpAddressRangeEntity;
-import cz.linksoft.hr.test.business.service.impl.CityServiceImpl;
+import cz.linksoft.hr.test.business.service.IpAddressRangeService;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Assert;
@@ -20,12 +20,12 @@ import java.util.List;
 public class CityServiceImplTest extends EasyMockSupport {
 
     private CityServiceImpl cityService;
-    private IpAddressRangeService ipAddressRangeService = createMock(IpAddressRangeService.class);
-    private CityDao cityDao = createMock(CityDao.class);
+    private IpAddressRangeService ipAddressRangeServiceMock = createMock(IpAddressRangeService.class);
+    private CityDao cityDaoMock = createMock(CityDao.class);
 
     @Before
     public void init() {
-        cityService = new CityServiceImpl(cityDao, ipAddressRangeService);
+        cityService = new CityServiceImpl(cityDaoMock, ipAddressRangeServiceMock);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class CityServiceImplTest extends EasyMockSupport {
         cityEntity.setId(id);
         cityEntity.setName("foo");
 
-        EasyMock.expect(cityDao.find(id)).andReturn(cityEntity);
+        EasyMock.expect(cityDaoMock.find(id)).andReturn(cityEntity);
 
         replayAll();
 
@@ -64,7 +64,7 @@ public class CityServiceImplTest extends EasyMockSupport {
         cityEntity.setId(1L);
         cityEntity.setName("foo");
 
-        EasyMock.expect(cityDao.getAll()).andReturn(Collections.singletonList(cityEntity));
+        EasyMock.expect(cityDaoMock.getAll()).andReturn(Collections.singletonList(cityEntity));
 
         replayAll();
 
@@ -84,7 +84,7 @@ public class CityServiceImplTest extends EasyMockSupport {
         final CityEntity cityEntity = new CityEntity();
         cityEntity.setId(cityId);
 
-        EasyMock.expect(cityDao.findByRegionId(regionId)).andReturn(Collections.singletonList(cityEntity));
+        EasyMock.expect(cityDaoMock.findByRegionId(regionId)).andReturn(Collections.singletonList(cityEntity));
 
         replayAll();
 
@@ -116,7 +116,7 @@ public class CityServiceImplTest extends EasyMockSupport {
         final CityEntity cityEntity = new CityEntity();
         cityEntity.setId(cityId);
 
-        EasyMock.expect(cityDao.findByCountryId(countryId)).andReturn(Collections.singletonList(cityEntity));
+        EasyMock.expect(cityDaoMock.findByCountryId(countryId)).andReturn(Collections.singletonList(cityEntity));
 
         replayAll();
 
@@ -144,7 +144,7 @@ public class CityServiceImplTest extends EasyMockSupport {
     public void testGuessCityForIpNumberNoMatch() {
         final Long ipNumber = 1L;
 
-        EasyMock.expect(ipAddressRangeService.findByIpNumber(ipNumber)).andReturn(null);
+        EasyMock.expect(ipAddressRangeServiceMock.findByIpNumber(ipNumber)).andReturn(null);
 
         replayAll();
 
@@ -166,8 +166,8 @@ public class CityServiceImplTest extends EasyMockSupport {
         ipAddressRangeEntity.setId(ipId);
         ipAddressRangeEntity.setCity(cityEntity);
 
-        EasyMock.expect(ipAddressRangeService.findByIpNumber(ipNumber)).andReturn(ipAddressRangeEntity);
-        EasyMock.expect(cityDao.find(cityId)).andReturn(cityEntity);
+        EasyMock.expect(ipAddressRangeServiceMock.findByIpNumber(ipNumber)).andReturn(ipAddressRangeEntity);
+        EasyMock.expect(cityDaoMock.find(cityId)).andReturn(cityEntity);
 
         replayAll();
 

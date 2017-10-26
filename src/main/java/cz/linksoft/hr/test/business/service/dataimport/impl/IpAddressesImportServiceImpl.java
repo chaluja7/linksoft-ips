@@ -10,7 +10,6 @@ import cz.linksoft.hr.test.business.service.IpAddressRangeService;
 import cz.linksoft.hr.test.business.service.RegionService;
 import cz.linksoft.hr.test.business.service.dataimport.IpAddressesImportService;
 import cz.linksoft.hr.test.business.service.dataimport.exception.ImportRowFailedException;
-import cz.linksoft.hr.test.core.ApplicationDataResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +33,16 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressesImportServiceImpl.class);
 
-    protected final ApplicationDataResourceProvider applicationDataResourceProvider;
-    protected final CountryService countryService;
-    protected final RegionService regionService;
-    protected final CityService cityService;
-    protected final IpAddressRangeService ipAddressRangeService;
+    private final CountryService countryService;
+    private final RegionService regionService;
+    private final CityService cityService;
+    private final IpAddressRangeService ipAddressRangeService;
 
     @Autowired
-    public IpAddressesImportServiceImpl(ApplicationDataResourceProvider applicationDataResourceProvider,
-                                        CountryService countryService,
+    public IpAddressesImportServiceImpl(CountryService countryService,
                                         RegionService regionService,
                                         CityService cityService,
                                         IpAddressRangeService ipAddressRangeService) {
-        this.applicationDataResourceProvider = applicationDataResourceProvider;
         this.countryService = countryService;
         this.regionService = regionService;
         this.cityService = cityService;
@@ -75,10 +71,8 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
 
             try {
                 LOGGER.debug(line);
-                // split to columns, see https://stackoverflow.com/questions/15738918/splitting-a-csv-file-with-quotes-as-text-delimiter-using-string-split
-                // if some enquoted value contains odd number of escaped quotes (for example "this \"is it" this regex will fail
-                // question is, if its really valid value? for even number of escaped quotes in enquoted string this works just fine ("this \"is\" it").
-                importRow = new ImportRow(fixElementsWrappingQuotes(line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")));
+                // map line
+                importRow = mapLine(line);
 
                 // if country was not already in dataset, then add it into map
                 if (!countriesMap.containsKey(importRow.getCountryCode())) {
@@ -137,6 +131,8 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
 
     /**
      * will get rid of quotes surrounding the value
+     *
+     * non-prive for easy testability
      * @param arr array of elements to fix
      * @return array of fixed elements
      */
@@ -153,9 +149,23 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
     }
 
     /**
-     * Entity representing one row of CSV file
+     * split to columns, see https://stackoverflow.com/questions/15738918/splitting-a-csv-file-with-quotes-as-text-delimiter-using-string-split
+     * if some enquoted value contains odd number of escaped quotes (for example "this \"is it" this regex will fail
+     * question is, if its really valid value? for even number of escaped quotes in enquoted string this works just fine ("this \"is\" it").
+     *
+     * non-prive for easy testability
+     * @param line line of csv import file
+     * @return mapped import row
      */
-    private static class ImportRow {
+    static ImportRow mapLine(String line) {
+        return new ImportRow(fixElementsWrappingQuotes(line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")));
+    }
+
+    /**
+     * Entity representing one row of CSV file
+     * non-prive for easy testability
+     */
+    static class ImportRow {
 
         private final Long ipFrom;
 

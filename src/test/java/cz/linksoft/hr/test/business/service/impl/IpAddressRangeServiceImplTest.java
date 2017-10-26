@@ -1,8 +1,7 @@
-package cz.linksoft.hr.test.business.service;
+package cz.linksoft.hr.test.business.service.impl;
 
 import cz.linksoft.hr.test.business.dao.IpAddressRangeDao;
 import cz.linksoft.hr.test.business.entity.IpAddressRangeEntity;
-import cz.linksoft.hr.test.business.service.impl.IpAddressRangeServiceImpl;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Assert;
@@ -19,11 +18,11 @@ import java.util.List;
 public class IpAddressRangeServiceImplTest extends EasyMockSupport {
 
     private IpAddressRangeServiceImpl ipAddressRangeService;
-    private IpAddressRangeDao ipAddressRangeDao = createMock(IpAddressRangeDao.class);
+    private IpAddressRangeDao ipAddressRangeDaoMock = createMock(IpAddressRangeDao.class);
 
     @Before
     public void init() {
-        ipAddressRangeService = new IpAddressRangeServiceImpl(ipAddressRangeDao);
+        ipAddressRangeService = new IpAddressRangeServiceImpl(ipAddressRangeDaoMock);
     }
 
     @Test
@@ -34,7 +33,7 @@ public class IpAddressRangeServiceImplTest extends EasyMockSupport {
         ipAddressRangeEntity.setId(id);
         ipAddressRangeEntity.setRangeFrom(10L);
 
-        EasyMock.expect(ipAddressRangeDao.find(id)).andReturn(ipAddressRangeEntity);
+        EasyMock.expect(ipAddressRangeDaoMock.find(id)).andReturn(ipAddressRangeEntity);
 
         replayAll();
 
@@ -62,7 +61,7 @@ public class IpAddressRangeServiceImplTest extends EasyMockSupport {
         ipAddressRangeEntity.setId(1L);
         ipAddressRangeEntity.setRangeFrom(10L);
 
-        EasyMock.expect(ipAddressRangeDao.getAll()).andReturn(Collections.singletonList(ipAddressRangeEntity));
+        EasyMock.expect(ipAddressRangeDaoMock.getAll()).andReturn(Collections.singletonList(ipAddressRangeEntity));
 
         replayAll();
 
@@ -82,7 +81,7 @@ public class IpAddressRangeServiceImplTest extends EasyMockSupport {
         final IpAddressRangeEntity ipAddressRangeEntity = new IpAddressRangeEntity();
         ipAddressRangeEntity.setId(ipId);
 
-        EasyMock.expect(ipAddressRangeDao.findByCityId(cityId)).andReturn(Collections.singletonList(ipAddressRangeEntity));
+        EasyMock.expect(ipAddressRangeDaoMock.findByCityId(cityId)).andReturn(Collections.singletonList(ipAddressRangeEntity));
 
         replayAll();
 
@@ -113,7 +112,7 @@ public class IpAddressRangeServiceImplTest extends EasyMockSupport {
         final IpAddressRangeEntity ipAddressRangeEntity = new IpAddressRangeEntity();
         ipAddressRangeEntity.setId(ipId);
 
-        EasyMock.expect(ipAddressRangeDao.findByIpNumber(ipNumber)).andReturn(ipAddressRangeEntity);
+        EasyMock.expect(ipAddressRangeDaoMock.findByIpNumber(ipNumber)).andReturn(ipAddressRangeEntity);
 
         replayAll();
 

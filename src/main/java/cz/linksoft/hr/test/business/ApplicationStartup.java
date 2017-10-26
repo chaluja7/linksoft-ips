@@ -21,8 +21,8 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationStartup.class);
 
-    protected final IpAddressesImportService ipAddressesImportService;
-    protected final ApplicationDataResourceProvider applicationDataResourceProvider;
+    private final IpAddressesImportService ipAddressesImportService;
+    private final ApplicationDataResourceProvider applicationDataResourceProvider;
 
     @Autowired
     public ApplicationStartup(IpAddressesImportService ipAddressesImportService,
@@ -32,6 +32,8 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
     }
 
     /**
+     * Import all CSV files from resources.
+     *
      * This event is executed as late as conceivably possible to indicate that
      * the application is ready to service requests.
      */

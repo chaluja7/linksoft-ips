@@ -1,6 +1,10 @@
 package cz.linksoft.hr.test.business.service.dataimport;
 
 import cz.linksoft.hr.test.IntegrationTest;
+import cz.linksoft.hr.test.business.entity.CityEntity;
+import cz.linksoft.hr.test.business.entity.CountryEntity;
+import cz.linksoft.hr.test.business.entity.IpAddressRangeEntity;
+import cz.linksoft.hr.test.business.entity.RegionEntity;
 import cz.linksoft.hr.test.business.service.CityService;
 import cz.linksoft.hr.test.business.service.CountryService;
 import cz.linksoft.hr.test.business.service.IpAddressRangeService;
@@ -12,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 /**
  * @author cen83414
@@ -25,6 +31,11 @@ public class IpAddressImportServiceIT {
     private static final int OK_IMPORT_NUMBER_OF_REGIONS = 7;
     private static final int OK_IMPORT_NUMBER_OF_CITIES = 13;
     private static final int OK_IMPORT_NUMBER_OF_ROWS = 20;
+
+    private static final String INCLUDED_COUNTRY_CODE = "SK";
+    private static final String INCLUDED_REGION_NAME = "Nitriansky kraj";
+    private static final String INCLUDED_CITY_NAME = "Zlate Moravce";
+    private static final Long INCLUDED_IP_RANGE_FROM= 95564032L;
 
     @Autowired
     private IpAddressesImportService ipAddressesImportService;
@@ -53,10 +64,54 @@ public class IpAddressImportServiceIT {
 
         ipAddressesImportService.importAllIpAddresses(resourceLoader.getResource("classpath:test-data/ip2location-test-ok.csv.gz"));
 
-        Assert.assertEquals(OK_IMPORT_NUMBER_OF_COUNTRIES, countryService.getAll().size());
+        List<CountryEntity> countryEntities = countryService.getAll();
+        List<RegionEntity> regionEntities = regionService.getAll();
+        List<CityEntity> cityEntities = cityService.getAll();
+        List<IpAddressRangeEntity> ipAddressRangeEntities = ipAddressRangeService.getAll();
+
+        Assert.assertEquals(OK_IMPORT_NUMBER_OF_COUNTRIES, countryEntities.size());
         Assert.assertEquals(OK_IMPORT_NUMBER_OF_REGIONS, regionService.getAll().size());
         Assert.assertEquals(OK_IMPORT_NUMBER_OF_CITIES, cityService.getAll().size());
         Assert.assertEquals(OK_IMPORT_NUMBER_OF_ROWS, ipAddressRangeService.getAll().size());
+
+        // test contains data
+        boolean countryOk = false;
+        boolean regionOk = false;
+        boolean cityOk = false;
+        boolean ipAddressRangeOk = false;
+
+        for (CountryEntity countryEntity : countryEntities) {
+            if (INCLUDED_COUNTRY_CODE.equals(countryEntity.getCode())) {
+                countryOk = true;
+                break;
+            }
+        }
+
+        for (RegionEntity regionEntity : regionEntities) {
+            if (INCLUDED_REGION_NAME.equals(regionEntity.getName())) {
+                regionOk = true;
+                break;
+            }
+        }
+
+        for (CityEntity cityEntity : cityEntities) {
+            if (INCLUDED_CITY_NAME.equals(cityEntity.getName())) {
+                cityOk = true;
+                break;
+            }
+        }
+
+        for (IpAddressRangeEntity ipAddressRangeEntity : ipAddressRangeEntities) {
+            if (INCLUDED_IP_RANGE_FROM.equals(ipAddressRangeEntity.getRangeFrom())) {
+                ipAddressRangeOk = true;
+                break;
+            }
+        }
+
+        Assert.assertTrue("country missing", countryOk);
+        Assert.assertTrue("region missing", regionOk);
+        Assert.assertTrue("city missing", cityOk);
+        Assert.assertTrue("ip address range from missing", ipAddressRangeOk);
     }
 
     @Test(expected = ImportRowFailedException.class)
