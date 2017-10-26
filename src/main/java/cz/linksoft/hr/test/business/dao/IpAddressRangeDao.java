@@ -32,8 +32,9 @@ public class IpAddressRangeDao extends AbstractGenericJpaDao<IpAddressRangeEntit
      * @return ip address range entity, that given ip number belongs to
      */
     public IpAddressRangeEntity findByIpNumber(Long ipNumber) {
+        // TODO this is from assignment, but really is rangeTo exclusive?
         final List<IpAddressRangeEntity> ipNumbers = em.createQuery(
-            "select i from IpAddressRangeEntity i where :ipNumber between i.rangeFrom and i.rangeTo", IpAddressRangeEntity.class)
+            "select i from IpAddressRangeEntity i where :ipNumber >= i.rangeFrom and :ipNumber < i.rangeTo", IpAddressRangeEntity.class)
             .setParameter("ipNumber", ipNumber).getResultList();
 
         // return first result if more exist
