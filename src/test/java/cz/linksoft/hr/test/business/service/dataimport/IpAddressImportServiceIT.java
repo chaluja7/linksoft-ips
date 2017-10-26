@@ -27,6 +27,7 @@ import java.util.List;
 @IntegrationTest
 public class IpAddressImportServiceIT {
 
+    // below data are expected data to be in db after successful export
     private static final int OK_IMPORT_NUMBER_OF_COUNTRIES = 1;
     private static final int OK_IMPORT_NUMBER_OF_REGIONS = 7;
     private static final int OK_IMPORT_NUMBER_OF_CITIES = 13;

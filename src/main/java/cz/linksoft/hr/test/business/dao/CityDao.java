@@ -19,10 +19,18 @@ public class CityDao extends AbstractGenericJpaDao<CityEntity> {
         super(CityEntity.class);
     }
 
+    /**
+     * @param regionId id of region
+     * @return all cities that belong to given region
+     */
     public List<CityEntity> findByRegionId(long regionId) {
         return em.createNamedQuery("CityEntity.findByRegionId", CityEntity.class).setParameter("regionId", regionId).getResultList();
     }
 
+    /**
+     * @param countryId id of country
+     * @return all cities that belong to given country
+     */
     public List<CityEntity> findByCountryId(long countryId) {
         return em.createNamedQuery("CityEntity.findByCountryId", CityEntity.class).setParameter("countryId", countryId).getResultList();
     }

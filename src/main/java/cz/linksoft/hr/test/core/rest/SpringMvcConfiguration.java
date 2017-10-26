@@ -19,8 +19,14 @@ public class SpringMvcConfiguration extends WebMvcConfigurerAdapter {
 		registry.addConverter(new InetAddressConverter());
 	}
 
+	/**
+	 * Will check traffic limit to app.
+	 *
+	 * @param trafficLimitFilter trafficLimitFilter
+	 * @return filterRegistrationBean
+	 */
 	@Bean
-	public FilterRegistrationBean angularHtml5Filter(TrafficLimitFilter trafficLimitFilter) {
+	public FilterRegistrationBean appTrafficFilterBean(TrafficLimitFilter trafficLimitFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(trafficLimitFilter);
 		registration.addUrlPatterns("/*");

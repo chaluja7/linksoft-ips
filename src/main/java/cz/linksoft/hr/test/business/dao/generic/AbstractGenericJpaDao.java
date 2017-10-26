@@ -17,7 +17,7 @@ public abstract class AbstractGenericJpaDao<ENT extends AbstractEntity> implemen
     @PersistenceContext
     protected EntityManager em;
 
-    protected final Class<ENT> type;
+    private final Class<ENT> type;
 
     public AbstractGenericJpaDao(Class<ENT> type) {
         this.type = type;

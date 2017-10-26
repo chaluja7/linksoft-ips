@@ -33,9 +33,9 @@ public class TrafficLimitFilter implements Filter {
     private static final Map<Long, Long> REGION_TRAFFIC_MAP = new HashMap<>();
     private static final Map<Long, Long> COUNTRY_TRAFFIC_MAP = new HashMap<>();
 
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_CITY_PER_HOUR = 200;
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_REGION_PER_HOUR = 400;
-    private static final long MAX_NUMBER_OF_REQUESTS_FROM_COUNTRY_PER_HOUR = 600;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_CITY_PER_HOUR = 2000;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_REGION_PER_HOUR = 20000;
+    private static final long MAX_NUMBER_OF_REQUESTS_FROM_COUNTRY_PER_HOUR = 200000;
 
     private final CityService cityService;
 
@@ -52,7 +52,7 @@ public class TrafficLimitFilter implements Filter {
     /**
      * every hour will clear maps with number of accesses. So Traffic is limited in one hour window.
      */
-    @Scheduled(fixedDelay = 10000) // ten seconds // FIXME - one hour
+    @Scheduled(fixedDelay = 3600000)
     private synchronized void clearMaps() {
         CITY_TRAFFIC_MAP.clear();
         REGION_TRAFFIC_MAP.clear();
@@ -62,9 +62,7 @@ public class TrafficLimitFilter implements Filter {
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         // get IP address
-        final String xx = request.getRemoteAddr();
-        // TODO for testing purposes only!
-        final String requestIpAddress = "84.16.52.2";
+        final String requestIpAddress = request.getRemoteAddr();
         final InetAddress inetAddress = InetAddress.getByName(requestIpAddress);
         try {
             final Long ipNumber = EntityConverter.mapInetAddressToIpNumber(inetAddress);

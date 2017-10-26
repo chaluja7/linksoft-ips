@@ -16,6 +16,8 @@ import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 /**
+ * Integration test with DB for city DAO.
+ *
  * @author cen83414
  * @since 26.10.2017.
  */

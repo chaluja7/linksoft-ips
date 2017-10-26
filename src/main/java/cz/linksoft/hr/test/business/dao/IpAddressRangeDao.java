@@ -19,10 +19,18 @@ public class IpAddressRangeDao extends AbstractGenericJpaDao<IpAddressRangeEntit
         super(IpAddressRangeEntity.class);
     }
 
+    /**
+     * @param cityId id of city
+     * @return all ip address ranges from given city
+     */
     public List<IpAddressRangeEntity> findByCityId(Long cityId) {
         return em.createNamedQuery("IpAddressRangeEntity.findByCityId", IpAddressRangeEntity.class).setParameter("cityId", cityId).getResultList();
     }
 
+    /**
+     * @param ipNumber decimal ip Number
+     * @return ip address range entity, that given ip number belongs to
+     */
     public IpAddressRangeEntity findByIpNumber(Long ipNumber) {
         final List<IpAddressRangeEntity> ipNumbers = em.createQuery(
             "select i from IpAddressRangeEntity i where :ipNumber between i.rangeFrom and i.rangeTo", IpAddressRangeEntity.class)

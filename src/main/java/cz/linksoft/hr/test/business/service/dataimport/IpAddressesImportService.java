@@ -12,6 +12,11 @@ import javax.annotation.Nonnull;
  */
 public interface IpAddressesImportService {
 
+    /**
+     * will perform import of file with ip addresses
+     * @param resource file with ip addresses to import
+     * @throws Exception if import fails
+     */
     void importAllIpAddresses(@Nonnull Resource resource) throws Exception;
 
 }

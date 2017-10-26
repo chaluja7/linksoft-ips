@@ -13,7 +13,10 @@ import java.util.List;
  */
 public interface RegionService extends EntityService<RegionEntity> {
 
+    /**
+     * @param countryId if of country
+     * @return all regions that belong to given country
+     */
     List<RegionEntity> findByCountryId(Long countryId);
-
 
 }

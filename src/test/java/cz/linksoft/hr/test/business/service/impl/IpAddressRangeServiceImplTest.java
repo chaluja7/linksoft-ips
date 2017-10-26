@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Mocked test of ipAddressRange service.
+ *
  * @author cen83414
  * @since 26.10.2017.
  */

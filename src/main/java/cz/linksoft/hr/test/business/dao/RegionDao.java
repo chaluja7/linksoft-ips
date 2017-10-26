@@ -19,6 +19,10 @@ public class RegionDao extends AbstractGenericJpaDao<RegionEntity> {
         super(RegionEntity.class);
     }
 
+    /**
+     * @param countryId if of country
+     * @return all regions that belong to given country
+     */
     public List<RegionEntity> findByCountryId(long countryId) {
         return em.createNamedQuery("RegionEntity.findByCountryId", RegionEntity.class).setParameter("countryId", countryId).getResultList();
     }

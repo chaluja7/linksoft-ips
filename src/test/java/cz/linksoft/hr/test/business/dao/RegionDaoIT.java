@@ -14,6 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 /**
+ * Integration test with DB for region DAO.
+ *
  * @author cen83414
  * @since 26.10.2017.
  */

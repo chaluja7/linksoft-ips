@@ -50,11 +50,12 @@ public class IpAddressesImportServiceImpl implements IpAddressesImportService {
     }
 
     /**
-     * non-transactional on purpose
+     * non-transactional on purpose, if import will fail somewhere, already persisted data will stay in DB
      */
     @Override
     public void importAllIpAddresses(@Nonnull Resource resource) throws Exception {
         LOGGER.debug("IMPORTING FILE " + resource.getFilename());
+        // read import file
         final GZIPInputStream gzipInputStream = new GZIPInputStream(new BufferedInputStream(resource.getInputStream()));
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream));
 

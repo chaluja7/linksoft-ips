@@ -11,6 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.validation.ConstraintViolationException;
 
 /**
+ * Integration test with DB for country DAO.
+ *
  * @author cen83414
  * @since 26.10.2017.
  */

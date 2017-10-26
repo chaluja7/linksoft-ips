@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
+ * Helping class to perform mapping between entity objects and API objects.
+ *
  * @author jakubchalupa
  * @since 25.10.17
  */

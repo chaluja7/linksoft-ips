@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * RESTfull facade over {@link LocationService} and {@link IPAddressService}.
  *
- * Notes - if it was completely up to me, i'd rewrite this controller from scratch. Methods should return ResponseEntity<>
+ * FIXME - if it was completely up to me, i'd rewrite this controller from scratch. Methods should return ResponseEntity<>
  * and so this Controller does not need to implements LocationService and IpAddressService.
  *
  * LocationService and IpAddressService are another candidates to refactor. I'd love to remove it completely, so controller
@@ -32,7 +32,7 @@ import java.util.List;
  * but I consider it a unnecessary layer. Mapping from DB entities to API entities could take place directly here on Controller.
  *
  * Now its weird, how ResourceNotFoundException are handled - if LocationService would not exists, than only one call to
- * enties services would be necessary.
+ * enties services would be necessary. No extra check for resource existence would be necessary.
  *
  */
 @RestController
@@ -116,6 +116,7 @@ public class RestFacade extends AbstractController implements LocationService, I
 	@Override
 	@Nullable
 	public City guessCityForIPAddress(@RequestParam("ip") @Nonnull InetAddress ipAddress) {
+		// returns empty body and 200 if no city is found. Don't know if behavior should be different
 		return ipAddressService.guessCityForIPAddress(ipAddress);
 	}
 
