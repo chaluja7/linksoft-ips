@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,109 +32,107 @@ import java.util.zip.GZIPInputStream;
 @Service
 public class IpAddressesImportServiceImpl implements IpAddressesImportService {
 
-    @Autowired
-    protected ApplicationDataResourceProvider applicationDataResourceProvider;
+    private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressesImportServiceImpl.class);
+
+    protected final ApplicationDataResourceProvider applicationDataResourceProvider;
+    protected final CountryService countryService;
+    protected final RegionService regionService;
+    protected final CityService cityService;
+    protected final IpAddressRangeService ipAddressRangeService;
 
     @Autowired
-    protected CountryService countryService;
-
-    @Autowired
-    protected RegionService regionService;
-
-    @Autowired
-    protected CityService cityService;
-
-    @Autowired
-    protected IpAddressRangeService ipAddressRangeService;
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    public IpAddressesImportServiceImpl(ApplicationDataResourceProvider applicationDataResourceProvider,
+                                        CountryService countryService,
+                                        RegionService regionService,
+                                        CityService cityService,
+                                        IpAddressRangeService ipAddressRangeService) {
+        this.applicationDataResourceProvider = applicationDataResourceProvider;
+        this.countryService = countryService;
+        this.regionService = regionService;
+        this.cityService = cityService;
+        this.ipAddressRangeService = ipAddressRangeService;
+    }
 
     /**
      * non-transactional on purpose
      */
     @Override
-    public void importAllIpAddresses() throws Exception {
-        logger.debug("IMPORT STARTED");
+    public void importAllIpAddresses(@Nonnull Resource resource) throws Exception {
+        LOGGER.debug("IMPORTING FILE " + resource.getFilename());
+        final GZIPInputStream gzipInputStream = new GZIPInputStream(new BufferedInputStream(resource.getInputStream()));
+        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream));
 
-        for (Resource resource : applicationDataResourceProvider.getDataFileResources()) {
-            logger.debug("IMPORTING FILE " + resource.getFilename());
-            final GZIPInputStream gzipInputStream = new GZIPInputStream(new BufferedInputStream(resource.getInputStream()));
-            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream));
+        // map Country code -> country -> region -> city
+        // we need to mantain information to what region city belongs and to what country region belongs
+        // reason is, that in dataset names of regions and cities can be duplicated, fe. Dolní Lhota could be in Jihočeský kraj as well as in Kraj Vysočina
+        final Map<String, CountryWrapper> countriesMap = new HashMap<>();
 
+        String line;
+        ImportRow importRow;
+        int rowNumber = 0;
+        while ((line = bufferedReader.readLine()) != null) {
+            LOGGER.debug("IMPORTING LINE " + ++rowNumber);
 
-            // map Country code -> country -> region -> city
-            // we need to mantain information to what region city belongs and to what country region belongs
-            // reason is, that in dataset names of regions and cities can be duplicated, fe. Dolní Lhota could be in Jihočeský kraj as well as in Kraj Vysočina
-            final Map<String, CountryWrapper> countriesMap = new HashMap<>();
+            try {
+                LOGGER.debug(line);
+                // split to columns, see https://stackoverflow.com/questions/15738918/splitting-a-csv-file-with-quotes-as-text-delimiter-using-string-split
+                // if some enquoted value contains odd number of escaped quotes (for example "this \"is it" this regex will fail
+                // question is, if its really valid value? for even number of escaped quotes in enquoted string this works just fine ("this \"is\" it").
+                importRow = new ImportRow(fixElementsWrappingQuotes(line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")));
 
-            String line;
-            ImportRow importRow;
-            int rowNumber = 0;
-            while ((line = bufferedReader.readLine()) != null) {
-                logger.debug("IMPORTING LINE " + ++rowNumber);
+                // if country was not already in dataset, then add it into map
+                if (!countriesMap.containsKey(importRow.getCountryCode())) {
+                    final CountryWrapper countryWrapper = new CountryWrapper(importRow.getCountryCode(), importRow.getCountryName());
+                    countriesMap.put(importRow.getCountryCode(), countryWrapper);
 
-                try {
-                    logger.debug(line);
-                    // split to columns, see https://stackoverflow.com/questions/15738918/splitting-a-csv-file-with-quotes-as-text-delimiter-using-string-split
-                    // if some enquoted value contains odd number of escaped quotes (for example "this \"is it" this regex will fail
-                    // question is, if its really valid value? for even number of escaped quotes in enquoted string this works just fine ("this \"is\" it").
-                    importRow = new ImportRow(fixElementsWrappingQuotes(line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")));
-
-                    // if country was not already in dataset, then add it into map
-                    if (!countriesMap.containsKey(importRow.getCountryCode())) {
-                        final CountryWrapper countryWrapper = new CountryWrapper(importRow.getCountryCode(), importRow.getCountryName());
-                        countriesMap.put(importRow.getCountryCode(), countryWrapper);
-
-                        // persist this new country
-                        countryService.create(countryWrapper.getCountry());
-                    }
-
-                    final CountryWrapper countryWrapper = countriesMap.get(importRow.getCountryCode());
-                    final Map<String, RegionWrapper> regionsMap = countryWrapper.getRegionsMap();
-                    // if region was not already in dataset for given country, then add it into map
-                    if (!regionsMap.containsKey(importRow.getRegionName())) {
-                        final RegionWrapper regionWrapper = new RegionWrapper(importRow.getRegionName());
-
-                        countryWrapper.getCountry().addRegion(regionWrapper.getRegion());
-                        regionsMap.put(importRow.getRegionName(), regionWrapper);
-
-                        // persist this new region
-                        regionService.create(regionWrapper.getRegion());
-                    }
-
-                    final RegionWrapper regionWrapper = regionsMap.get(importRow.getRegionName());
-                    final Map<String, CityEntity> citiesMap = regionWrapper.getCitiesMap();
-                    // if city was not already in dataset for given region, then add it into map
-                    if (!citiesMap.containsKey(importRow.getCityName())) {
-                        final CityEntity cityEntity = new CityEntity();
-                        cityEntity.setName(importRow.getCityName());
-                        cityEntity.setLatitude(importRow.getCityLatitude());
-                        cityEntity.setLongitude(importRow.getCityLongitude());
-
-                        regionWrapper.getRegion().addCity(cityEntity);
-                        citiesMap.put(importRow.getCityName(), cityEntity);
-
-                        // persist this new city
-                        cityService.create(cityEntity);
-                    }
-
-                    // add ip address range to given city in region in country
-                    final IpAddressRangeEntity ipAddressRangeEntity = new IpAddressRangeEntity();
-                    ipAddressRangeEntity.setRangeFrom(importRow.getIpFrom());
-                    ipAddressRangeEntity.setRangeTo(importRow.getIpTo());
-                    citiesMap.get(importRow.getCityName()).addIpAddressRange(ipAddressRangeEntity);
-
-                    // persist address range
-                    ipAddressRangeService.create(ipAddressRangeEntity);
-                } catch (Exception e) {
-                    // if any error occured than audit the information about corrupted row
-                    throw new ImportRowFailedException(resource.getFilename(), rowNumber, e);
+                    // persist this new country
+                    countryService.create(countryWrapper.getCountry());
                 }
-            }
 
+                final CountryWrapper countryWrapper = countriesMap.get(importRow.getCountryCode());
+                final Map<String, RegionWrapper> regionsMap = countryWrapper.getRegionsMap();
+                // if region was not already in dataset for given country, then add it into map
+                if (!regionsMap.containsKey(importRow.getRegionName())) {
+                    final RegionWrapper regionWrapper = new RegionWrapper(importRow.getRegionName());
+
+                    countryWrapper.getCountry().addRegion(regionWrapper.getRegion());
+                    regionsMap.put(importRow.getRegionName(), regionWrapper);
+
+                    // persist this new region
+                    regionService.create(regionWrapper.getRegion());
+                }
+
+                final RegionWrapper regionWrapper = regionsMap.get(importRow.getRegionName());
+                final Map<String, CityEntity> citiesMap = regionWrapper.getCitiesMap();
+                // if city was not already in dataset for given region, then add it into map
+                if (!citiesMap.containsKey(importRow.getCityName())) {
+                    final CityEntity cityEntity = new CityEntity();
+                    cityEntity.setName(importRow.getCityName());
+                    cityEntity.setLatitude(importRow.getCityLatitude());
+                    cityEntity.setLongitude(importRow.getCityLongitude());
+
+                    regionWrapper.getRegion().addCity(cityEntity);
+                    citiesMap.put(importRow.getCityName(), cityEntity);
+
+                    // persist this new city
+                    cityService.create(cityEntity);
+                }
+
+                // add ip address range to given city in region in country
+                final IpAddressRangeEntity ipAddressRangeEntity = new IpAddressRangeEntity();
+                ipAddressRangeEntity.setRangeFrom(importRow.getIpFrom());
+                ipAddressRangeEntity.setRangeTo(importRow.getIpTo());
+                citiesMap.get(importRow.getCityName()).addIpAddressRange(ipAddressRangeEntity);
+
+                // persist address range
+                ipAddressRangeService.create(ipAddressRangeEntity);
+            } catch (Exception e) {
+                // if any error occured than audit the information about corrupted row
+                throw new ImportRowFailedException(resource.getFilename(), rowNumber, e);
+            }
         }
 
-        logger.debug("IMPORT DONE");
+        LOGGER.debug("IMPORT DONE");
     }
 
     /**

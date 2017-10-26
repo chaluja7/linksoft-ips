@@ -18,9 +18,9 @@ import java.util.List;
 @Table(name = "cities")
 @NamedQueries({
     @NamedQuery(name = "CityEntity.findByRegionId",
-        query = "select distinct c from CityEntity c left outer join fetch c.region where c.region.id = :regionId order by c.id"),
+        query = "select distinct c from CityEntity c where c.region.id = :regionId order by c.id"),
     @NamedQuery(name = "CityEntity.findByCountryId",
-        query = "select distinct c from CityEntity c left outer join fetch c.region where c.region.country.id = :countryId order by c.id")
+        query = "select distinct c from CityEntity c where c.region.country.id = :countryId order by c.id")
 })
 public class CityEntity extends AbstractEntity {
 
@@ -44,8 +44,8 @@ public class CityEntity extends AbstractEntity {
     @Max(180)
     private Double longitude;
 
-    /** Reference to {@link RegionEntity}. */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    /** Reference to {@link RegionEntity}. Eager on purpose (with city we always want region as well) */
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "region_id")
     private RegionEntity region;
 

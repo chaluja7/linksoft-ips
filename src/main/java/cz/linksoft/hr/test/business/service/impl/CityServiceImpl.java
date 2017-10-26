@@ -26,7 +26,8 @@ public class CityServiceImpl extends AbstractEntityService<CityEntity, CityDao> 
     protected IpAddressRangeService ipAddressRangeService;
 
     @Autowired
-    public CityServiceImpl(CityDao dao, IpAddressRangeService ipAddressRangeService) {
+    public CityServiceImpl(CityDao dao,
+                           IpAddressRangeService ipAddressRangeService) {
         super(dao);
         this.ipAddressRangeService = ipAddressRangeService;
     }
@@ -55,13 +56,6 @@ public class CityServiceImpl extends AbstractEntityService<CityEntity, CityDao> 
             return null;
         }
 
-        CityEntity cityEntity = dao.find(ipAddressRangeEntity.getCity().getId());
-        if (cityEntity != null) {
-            // needs to return lazy loaded region
-            // noinspection ResultOfMethodCallIgnored
-            cityEntity.getRegion().getId();
-        }
-
-        return cityEntity;
+        return dao.find(ipAddressRangeEntity.getCity().getId());
     }
 }

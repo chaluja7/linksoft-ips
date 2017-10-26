@@ -1,11 +1,13 @@
 package cz.linksoft.hr.test.business;
 
 import cz.linksoft.hr.test.business.service.dataimport.IpAddressesImportService;
+import cz.linksoft.hr.test.core.ApplicationDataResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,10 +19,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-    @Autowired
-    protected IpAddressesImportService ipAddressesImportService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationStartup.class);
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final IpAddressesImportService ipAddressesImportService;
+    protected final ApplicationDataResourceProvider applicationDataResourceProvider;
+
+    @Autowired
+    public ApplicationStartup(IpAddressesImportService ipAddressesImportService,
+                              ApplicationDataResourceProvider applicationDataResourceProvider) {
+        this.ipAddressesImportService = ipAddressesImportService;
+        this.applicationDataResourceProvider = applicationDataResourceProvider;
+    }
 
     /**
      * This event is executed as late as conceivably possible to indicate that
@@ -28,11 +37,13 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
      */
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        System.out.println("XXX READY XXX");
         try {
-            ipAddressesImportService.importAllIpAddresses();
+            for (Resource resource : applicationDataResourceProvider.getDataFileResources()) {
+                ipAddressesImportService.importAllIpAddresses(resource);
+            }
         } catch (Exception e) {
-            logger.error("IP addresses import failed", e);
+            // on purpose NO other resource will be imported, this can be customized of course
+            LOGGER.error("IP addresses import failed", e);
         }
     }
 }

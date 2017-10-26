@@ -17,7 +17,7 @@ public interface EntityService<ENT extends AbstractEntity> {
      * @param id id of entity
      * @return entity by id or null
      */
-    ENT get(Long id);
+    ENT find(Long id);
 
     /**
      * update entity

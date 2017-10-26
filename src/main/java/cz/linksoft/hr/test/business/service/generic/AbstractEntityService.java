@@ -29,7 +29,7 @@ public abstract class AbstractEntityService<ENT extends AbstractEntity, DAO exte
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public ENT get(Long id) {
+    public ENT find(Long id) {
         return id != null ? dao.find(id) : null;
     }
 

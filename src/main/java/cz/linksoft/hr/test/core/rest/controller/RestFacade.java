@@ -67,7 +67,7 @@ public class RestFacade extends AbstractController implements LocationService, I
 	@Override
 	@Nonnull
 	public List<Region> getAllCountryRegions(@PathVariable("countryId") @Nonnull Long countryId) {
-		if (countryService.get(countryId) == null) {
+		if (countryService.find(countryId) == null) {
 			throw new ResourceNotFoundException();
 		}
 
@@ -78,7 +78,7 @@ public class RestFacade extends AbstractController implements LocationService, I
 	@Override
 	@Nonnull
 	public List<City> getAllRegionCities(@PathVariable("regionId") @Nonnull Long regionId) {
-		if (regionService.get(regionId) == null) {
+		if (regionService.find(regionId) == null) {
 			throw new ResourceNotFoundException();
 		}
 
@@ -89,7 +89,7 @@ public class RestFacade extends AbstractController implements LocationService, I
 	@Override
 	@Nonnull
 	public List<City> getAllCountryCitites(@PathVariable("countryId") @Nonnull Long countryId) {
-		if (countryService.get(countryId) == null) {
+		if (countryService.find(countryId) == null) {
 			throw new ResourceNotFoundException();
 		}
 
@@ -105,7 +105,7 @@ public class RestFacade extends AbstractController implements LocationService, I
 	@Override
 	@Nonnull
 	public List<IpAddressRange> getAllCityIPAddressRanges(@PathVariable("cityId") @Nonnull Long cityId) {
-		if (cityService.get(cityId) == null) {
+		if (cityService.find(cityId) == null) {
 			throw new ResourceNotFoundException();
 		}
 

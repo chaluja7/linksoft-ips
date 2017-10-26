@@ -1,5 +1,9 @@
 package cz.linksoft.hr.test.business.service.dataimport;
 
+import org.springframework.core.io.Resource;
+
+import javax.annotation.Nonnull;
+
 /**
  * Service to perform import of all available datasets.
  *
@@ -8,6 +12,6 @@ package cz.linksoft.hr.test.business.service.dataimport;
  */
 public interface IpAddressesImportService {
 
-    void importAllIpAddresses() throws Exception;
+    void importAllIpAddresses(@Nonnull Resource resource) throws Exception;
 
 }

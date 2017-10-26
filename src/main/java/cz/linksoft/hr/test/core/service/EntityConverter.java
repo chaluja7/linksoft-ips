@@ -137,7 +137,10 @@ public class EntityConverter {
             return null;
         }
 
-        String[] ipAddressInArray = inetAddress.getHostAddress().split("\\.");
+        final String[] ipAddressInArray = inetAddress.getHostAddress().split("\\.");
+        if (ipAddressInArray.length != 4) {
+            throw new IllegalArgumentException("IPv4 addresses allowed only!");
+        }
 
         long result = 0;
         for (int i = 0; i < ipAddressInArray.length; i++) {

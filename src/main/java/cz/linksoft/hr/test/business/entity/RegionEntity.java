@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "regions")
 @NamedQuery(name = "RegionEntity.findByCountryId",
-    query = "select distinct r from RegionEntity r left outer join fetch r.country where r.country.id = :countryId order by r.id")
+    query = "select distinct r from RegionEntity r where r.country.id = :countryId order by r.id")
 public class RegionEntity extends AbstractEntity {
 
     /** Region name. */
@@ -24,8 +24,8 @@ public class RegionEntity extends AbstractEntity {
     @Size(min = 1, max = 128)
     private String name;
 
-    /** Reference to {@link CountryEntity}. */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    /** Reference to {@link CountryEntity}. Eager on purpose (with region we always want country as well) */
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "country_id")
     private CountryEntity country;
 

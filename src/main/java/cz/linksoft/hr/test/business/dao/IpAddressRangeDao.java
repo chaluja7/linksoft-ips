@@ -25,7 +25,7 @@ public class IpAddressRangeDao extends AbstractGenericJpaDao<IpAddressRangeEntit
 
     public IpAddressRangeEntity findByIpNumber(Long ipNumber) {
         final List<IpAddressRangeEntity> ipNumbers = em.createQuery(
-            "select i from IpAddressRangeEntity i left outer join fetch i.city where :ipNumber between i.rangeFrom and i.rangeTo", IpAddressRangeEntity.class)
+            "select i from IpAddressRangeEntity i where :ipNumber between i.rangeFrom and i.rangeTo", IpAddressRangeEntity.class)
             .setParameter("ipNumber", ipNumber).getResultList();
 
         // return first result if more exist
